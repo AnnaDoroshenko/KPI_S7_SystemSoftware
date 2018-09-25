@@ -1,28 +1,39 @@
 #include "Process.h"
 
 
-Process::Process (float birthTime) :
-    // AMOUNT_OF_PAGES()
-        /* unsigned int amountOfPages,  */
-        /* std::vector<unsigned int> workingSet,  */
-        float birthTime {
-        /* float lifeTime) { */
-    srand(time(0));
-    amountOfPages = static_cast <unsigned int> (rand()) / static_cast <unsigned int> (RAND_MAX);
-    workingSet = generateWorkingSet(amountOfPages);
-    birthTime = birthTime;
-    lifeTime = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-};
+Process::Process (unsigned int birthTime) :
+    AMOUNT_OF_PAGES((rand() % 10) + 1), 
+    WORKING_SET(generateWorkingSet()), 
+    LIFE_TIME((rand() % 20) + 1), 
+    BIRTH_TIME(birthTime) {}
 
 
-std::vector<unsigned int> Process::generateWorkingSet(const unsigned int& amountOfPages) {
-    // TODO Have no idea yet :(
+std::vector<unsigned int> Process::generateWorkingSet() {
+    const unsigned int SIZE_OF_WORKING_SET = 0.3 * AMOUNT_OF_PAGES;
+    std::vector<unsigned int> workingSet;
+    workingSet.reserve(SIZE_OF_WORKING_SET);
+    // FIXME: find some another approach to fill working set
+    for (unsigned int i = 0; i < SIZE_OF_WORKING_SET; i++) {
+        workingSet.push_back(i);
+    }
+
+    return workingSet;
 }
 
 
-unsigned int Process::getExcecutingPage() {}
+unsigned int Process::getExcecutingPage() {
+    const unsigned int randNumber = (rand() % 10) + 1;
+    unsigned int page = 0;
+    if (randNumber <= 9) {
+        // get page from the working set
+    } else {
+        // get any page, that isn't included to the working set
+    }
+
+    return page;
+}
 
 
-bool Process::isAlive (float currentTime) {
-    return ((currentTime - birthTime) < lifeTime) ? true : false;
+bool Process::isAlive (unsigned int currentTime) const {
+    return ((currentTime - BIRTH_TIME) < LIFE_TIME);
 }
