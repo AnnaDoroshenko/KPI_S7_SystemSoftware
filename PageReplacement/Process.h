@@ -13,11 +13,9 @@ class Process {
     const unsigned int BIRTH_TIME;
 
     public:
-    Process (unsigned int birthtime);
-
-    private:
+    Process(unsigned int birthtime);
     std::vector<unsigned int> generateWorkingSet();
-    unsigned int getExcecutingPage();
+    unsigned int getExecutingPage();
     bool isAlive (unsigned int currentTime) const;
 };
 
