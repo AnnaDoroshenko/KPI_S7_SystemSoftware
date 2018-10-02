@@ -1,10 +1,20 @@
 #include "MMU.h"
 
 
-MMU::MMU(unsigned int pageAmount, std::vector<Process*>& bunchOfProcesses) : 
+MMU::MMU(unsigned int pageAmount, const std::vector<Process*>& bunchOfProcesses) : 
     AMOUNT_OF_RAM_PAGES(pageAmount) {
         fillDefaultFreeQueue();
         tableOfPresence.reserve(AMOUNT_OF_RAM_PAGES);
+        pages.reserve(bunchOfProcesses.size());
+        for (unsigned int i = 0; i < bunchOfProcesses.size(); i++) {
+            const unsigned int pageAmount = bunchOfProcesses[i]->getPageAmount();
+            std::vector<Page> pagesOfCurrentProcess;
+            pagesOfCurrentProcess.reserve(pageAmount);
+            for (unsigned int j = 0; j < pageAmount; j++) {
+                pagesOfCurrentProcess.push_back(Page());
+            }
+            pages.push_back(pagesOfCurrentProcess);
+        }
 }
 
 
@@ -16,7 +26,7 @@ void MMU::fillDefaultFreeQueue() {
 
 
 bool MMU::hasFreePages() {
-    return (freeQueue.size() != 0) ? true : false;
+    return (freeQueue.size() != 0);
 }
 
 
@@ -25,16 +35,17 @@ void MMU::pushToFreeQueue(unsigned int address) {
 }
 
 
-void MMU::eraseFromFreeQueue(unsigned int address) {
-    freeQueue.erase(
-            std::remove(freeQueue.begin(), freeQueue.end(), address), freeQueue.end());
-}
+/* void MMU::eraseFromFreeQueue(unsigned int address) { */
+/*     freeQueue.erase( */
+/*             std::remove(freeQueue.begin(), freeQueue.end(), address), freeQueue.end()); */
+/* } */
 
 
-void MMU::pushToTakenQueue() {
+unsigned int MMU::pushToTakenQueue() {
     unsigned int address = freeQueue.at(freeQueue.size() - 1);
     takenQueue.push_back(address);
     freeQueue.pop_back();
+    return address;
 }
 
 
@@ -43,9 +54,12 @@ void MMU::eraseFromTakenQueue(unsigned int address) {
             std::remove(takenQueue.begin(), takenQueue.end(), address), takenQueue.end());
 }
 
+
 void MMU::workWith(unsigned int processNo, unsigned int pageNo) {
+    // check (and set flag) presenceFlag
     if (hasFreePages()) {
-        pushToTakenQueue();
+       unsigned int addr = pushToTakenQueue();
+       // tableOfPresence[addr] = Row(processNo, pageNo, );
         // create new row and push it into tableOfPresence
     } else {
         unsigned int age = MMU::tableOfPresence[0].getAge();

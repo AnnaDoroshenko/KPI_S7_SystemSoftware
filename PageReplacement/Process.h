@@ -17,6 +17,7 @@ class Process {
     std::vector<unsigned int> generateWorkingSet();
     unsigned int getExecutingPage();
     bool isAlive (unsigned int currentTime) const;
+    unsigned int getPageAmount();
 };
 
 

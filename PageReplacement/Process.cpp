@@ -37,3 +37,8 @@ unsigned int Process::getExecutingPage() {
 bool Process::isAlive (unsigned int currentTime) const {
     return ((currentTime - BIRTH_TIME) < LIFE_TIME);
 }
+
+
+unsigned int Process::getPageAmount(){
+    return AMOUNT_OF_PAGES;
+}
