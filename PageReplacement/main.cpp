@@ -21,15 +21,12 @@ int main() {
     }
 
     MMU mmu(AMOUNT_OF_RAM_PAGES, bunchOfProcesses);
-    std::cout << "here1" << std::endl;
 
     while (tick < TICKS) {
         const unsigned int PROCESS_No = rand() % AMOUNT_OF_PROCESSES;
         const unsigned int PAGE_No = bunchOfProcesses[PROCESS_No]->getExecutingPage();
         const bool MODIFICATION = ((rand() % 2) == 0);
-        std::cout << "here2" << std::endl;
         mmu.workWith(PROCESS_No, PAGE_No, MODIFICATION);
-        std::cout << "here3" << std::endl;
 
         /* for (unsigned int i = 0; i < bunchOfProcesses.size(); i++) { */
         /*     if (!bunchOfProcesses[i].isAlive(tick)) { */

@@ -19,7 +19,7 @@ class MMU {
 
     public:
     MMU(unsigned int pageAmount, const std::vector<Process*>& bunchOfProcesses);
-    void workWith(unsigned int processNo, unsigned int pageNo, bool modified);;
+    void workWith(unsigned int processNo, unsigned int pageNo, bool modified);
 
     private:
     void fillDefaultFreeQueue();

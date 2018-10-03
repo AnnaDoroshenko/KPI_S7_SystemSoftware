@@ -2,9 +2,9 @@
 
 
 MMU::MMU(unsigned int pageAmount, const std::vector<Process*>& bunchOfProcesses) : 
-    AMOUNT_OF_RAM_PAGES(pageAmount) {
+    AMOUNT_OF_RAM_PAGES(pageAmount),
+    tableOfPresence(std::vector<Row>(AMOUNT_OF_RAM_PAGES, Row(0, 0, 0))) {
         fillDefaultFreeQueue();
-        tableOfPresence.reserve(AMOUNT_OF_RAM_PAGES);
         pages.reserve(bunchOfProcesses.size());
         for (unsigned int i = 0; i < bunchOfProcesses.size(); i++) {
             const unsigned int pageAmount = bunchOfProcesses[i]->getPageAmount();
