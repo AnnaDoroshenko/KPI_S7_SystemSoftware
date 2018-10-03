@@ -25,7 +25,8 @@ int main() {
     while (tick < TICKS) {
         const unsigned int PROCESS_No = rand() % AMOUNT_OF_PROCESSES;
         const unsigned int PAGE_No = bunchOfProcesses[PROCESS_No]->getExecutingPage();
-        // mmu.workWith(PROCESS_No, PAGE_No);
+        const unsigned int MODIFICATION = rand() % 2;
+        mmu.workWith(PROCESS_No, PAGE_No, MODIFICATION);
 
         /* for (unsigned int i = 0; i < bunchOfProcesses.size(); i++) { */
         /*     if (!bunchOfProcesses[i].isAlive(tick)) { */

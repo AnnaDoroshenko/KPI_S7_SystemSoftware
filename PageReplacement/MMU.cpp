@@ -15,7 +15,7 @@ MMU::MMU(unsigned int pageAmount, const std::vector<Process*>& bunchOfProcesses)
             }
             pages.push_back(pagesOfCurrentProcess);
         }
-}
+    }
 
 
 void MMU::fillDefaultFreeQueue() {
@@ -30,9 +30,9 @@ bool MMU::hasFreePages() {
 }
 
 
-void MMU::pushToFreeQueue(unsigned int address) {
-    freeQueue.push_back(address);
-}
+/* void MMU::pushToFreeQueue(unsigned int address) { */
+/*     freeQueue.push_back(address); */
+/* } */
 
 
 /* void MMU::eraseFromFreeQueue(unsigned int address) { */
@@ -49,36 +49,83 @@ unsigned int MMU::pushToTakenQueue() {
 }
 
 
-void MMU::eraseFromTakenQueue(unsigned int address) {
-    takenQueue.erase(
-            std::remove(takenQueue.begin(), takenQueue.end(), address), takenQueue.end());
+/* void MMU::eraseFromTakenQueue(unsigned int address) { */
+/*     takenQueue.erase( */
+/*             std::remove(takenQueue.begin(), takenQueue.end(), address), takenQueue.end()); */
+/* } */
+
+
+void MMU::workWith(unsigned int processNo, unsigned int pageNo, unsigned char modified) {
+    // check (and set flag) presenceFlag
+    Page currentPage = pages[processNo][pageNo];
+    if (!currentPage.isPresent()) {
+        if (hasFreePages()) {
+            unsigned int addr = pushToTakenQueue();
+            // tableOfPresence[addr] = Row(processNo, pageNo, );
+        } else {
+            unsigned int age = MMU::tableOfPresence[0].getAge();
+            unsigned int index = 0;
+            for (unsigned int i = 1; i < tableOfPresence.size(); i++) {
+                const unsigned int currentAge = tableOfPresence[i].getAge();
+                if (currentAge < age) {
+                    age = currentAge;
+                    index = i;
+                }
+            }
+            Row rowAboutUnusedPage = tableOfPresence[index];
+            const unsigned int procNum = rowAboutUnusedPage.getProcessNo();
+            const unsigned int pageNum = rowAboutUnusedPage.getPageNo();
+            Page unusedPage = pages[procNum][pageNum];
+            unusedPage.present(false);
+            unusedPage.access(false);
+            unusedPage.modify(false);
+            // tableOfPresence[index] = Row(processNo, pageNo, );
+        }
+        currentPage.present(true);
+        currentPage.access(true);
+        if (modified == '1') {
+            currentPage.modify(true);
+        }
+    } else if (modified == '1') {
+        // ?? what about access ??
+        currentPage.modify(true);
+        // change age in the appropriate Row
+    }
 }
 
 
-void MMU::workWith(unsigned int processNo, unsigned int pageNo) {
-    // check (and set flag) presenceFlag
-    if (hasFreePages()) {
-       unsigned int addr = pushToTakenQueue();
-       // tableOfPresence[addr] = Row(processNo, pageNo, );
-        // create new row and push it into tableOfPresence
-    } else {
-        unsigned int age = MMU::tableOfPresence[0].getAge();
-        unsigned int index = 0;
-        for (unsigned int i = 1; i < tableOfPresence.size(); i++) {
-            const unsigned int currentAge = tableOfPresence[i].getAge();
-            if (currentAge < age) {
-                age = currentAge;
-                index = i;
-            }
-        }
-        // go to tableOfPresence.at(index) and change it
-        // replaceInTakenQueue()
-    }
+bool MMU::Page::isPresent() {
+    return presenceFlag;
+}
+
+
+void MMU::Page::present(bool state) {
+    presenceFlag = state;
+}
+
+
+void MMU::Page::access(bool state) {
+    accessFlag = state;
+}
+
+
+void MMU::Page::modify(bool state) {
+    modificationFlag = state;
 }
 
 
 MMU::Row::Row(unsigned int processNo, unsigned int pageNo, unsigned int age) : 
     processNo(processNo), pageNo(pageNo), age(age) {}
+
+
+unsigned int MMU::Row::getProcessNo() {
+    return processNo;
+}
+
+
+unsigned int MMU::Row::getPageNo() {
+    return pageNo;
+}
 
 
 unsigned int MMU::Row::getAge() {

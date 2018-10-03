@@ -18,7 +18,7 @@ class MMU {
 
     public:
     MMU(unsigned int pageAmount, const std::vector<Process*>& bunchOfProcesses);
-    void workWith(unsigned int processNo, unsigned int pageNo);
+    void workWith(unsigned int processNo, unsigned int pageNo, unsigned char modified);;
 
     private:
     void fillDefaultFreeQueue();
@@ -32,7 +32,12 @@ class MMU {
         bool presenceFlag = false;
         bool accessFlag = false;
         bool modificationFlag = false;
-        unsigned int RamAddress = 0;
+        /* unsigned int RamAddress = 0; */
+
+        bool isPresent();
+        void present(bool state);
+        void access(bool state);
+        void modify(bool state);
     };
 
     struct Row {
@@ -40,8 +45,10 @@ class MMU {
         unsigned int pageNo;
         unsigned int age;
 
-    Row (unsigned int processNo, unsigned int pageNo, unsigned int age);
-    unsigned int getAge();
+        Row (unsigned int processNo, unsigned int pageNo, unsigned int age);
+        unsigned int getProcessNo();
+        unsigned int getPageNo();
+        unsigned int getAge();
     };
 };
 
