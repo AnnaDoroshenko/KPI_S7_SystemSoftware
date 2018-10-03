@@ -1,7 +1,7 @@
 # The name of the main file and executable
 mainFileName = main
 # Files that have .h and .cpp versions
-classFiles = Process #MUU
+classFiles = Process MMU
 # Files that only have the .h version
 justHeaderFiles =
 # Compilation flags
