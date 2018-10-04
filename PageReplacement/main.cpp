@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
 #include "Process.h"
 #include "MMU.h"
 
@@ -26,6 +23,8 @@ int main() {
         const unsigned int PROCESS_No = rand() % AMOUNT_OF_PROCESSES;
         const unsigned int PAGE_No = bunchOfProcesses[PROCESS_No]->getExecutingPage();
         const bool MODIFICATION = ((rand() % 2) == 0);
+        std::cout << "-----------------------------------------" << std::endl;
+        std::cout << "-------------- tick " << tick << " -----------------" << std::endl;
         mmu.workWith(PROCESS_No, PAGE_No, MODIFICATION);
 
         /* for (unsigned int i = 0; i < bunchOfProcesses.size(); i++) { */

@@ -14,10 +14,12 @@ class Process {
 
     public:
     Process(unsigned int birthtime);
-    std::vector<unsigned int> generateWorkingSet();
     unsigned int getExecutingPage();
-    bool isAlive (unsigned int currentTime) const;
     unsigned int getPageAmount();
+
+    private:
+    std::vector<unsigned int> generateWorkingSet();
+    // bool isAlive (unsigned int currentTime) const;
 };
 
 

@@ -3,8 +3,7 @@
 
 
 #include <iostream>
-#include <vector>
-/* #include <algorithm> */
+#include <bitset>
 #include "Process.h"
 
 

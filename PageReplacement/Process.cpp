@@ -23,20 +23,22 @@ std::vector<unsigned int> Process::generateWorkingSet() {
 
 unsigned int Process::getExecutingPage() {
     const unsigned int randNumber = (rand() % 10) + 1;
+    /* const unsigned int size = WORKING_SET.size(); */
     unsigned int page = 0;
-    if (randNumber <= 9) {
-        // get page from the working set
+    if (randNumber <= 5) {
+        // page = rand() % WORKING_SET.size();
+        page = rand() % 3;
     } else {
-        // get any page, that isn't included to the working set
+        page = (rand() % AMOUNT_OF_PAGES) + WORKING_SET.size();
     }
 
     return page;
 }
 
 
-bool Process::isAlive (unsigned int currentTime) const {
-    return ((currentTime - BIRTH_TIME) < LIFE_TIME);
-}
+// bool Process::isAlive (unsigned int currentTime) const {
+//     return ((currentTime - BIRTH_TIME) < LIFE_TIME);
+// }
 
 
 unsigned int Process::getPageAmount(){

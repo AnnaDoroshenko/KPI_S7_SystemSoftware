@@ -76,8 +76,13 @@ void MMU::workWith(unsigned int processNo, unsigned int pageNo, bool modified) {
             unusedPage.present(false);
             unusedPage.access(false);
             unusedPage.modify(false);
-            // cout about paging
+            /* std::cout << "-----------------------------------------" << std::endl; */
+            std::cout << "/disk_w/ Write into disk Process " << unusedPageRow.processNo;
+            std::cout << " Page " << unusedPageRow.pageNo << std::endl;
+            std::cout << "/ram_w/ Write into RAM Process " << processNo;
+            std::cout << " Page " << pageNo << std::endl;
             tableOfPresence[index] = Row(processNo, pageNo, 0);
+            std::cout << "-----------------------------------------" << std::endl;
         }
         currentPage.present(true);
     }
@@ -105,7 +110,7 @@ void MMU::showTableOfPresence() {
     for (Row row : tableOfPresence) {
         std::cout << "Process " << row.processNo;
         std::cout << " Page " << row.pageNo;
-        std::cout << " Age: " << row.age << std::endl;
+        std::cout << " Age: " << std::bitset<16>(row.age) << std::endl;
     }
 }
 
