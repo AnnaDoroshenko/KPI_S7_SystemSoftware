@@ -23,13 +23,12 @@ std::vector<unsigned int> Process::generateWorkingSet() {
 
 unsigned int Process::getExecutingPage() {
     const unsigned int randNumber = (rand() % 10) + 1;
-    /* const unsigned int size = WORKING_SET.size(); */
+    const unsigned int size = WORKING_SET.size() + 1;
     unsigned int page = 0;
-    if (randNumber <= 5) {
-        // page = rand() % WORKING_SET.size();
-        page = rand() % 3;
+    if (randNumber <= 9) {
+        page = rand() % size;
     } else {
-        page = (rand() % AMOUNT_OF_PAGES) + WORKING_SET.size();
+        page = (rand() % AMOUNT_OF_PAGES) + size;
     }
 
     return page;
