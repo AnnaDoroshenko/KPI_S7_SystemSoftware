@@ -22,12 +22,37 @@ class Core:
 
 
 class Family:
-    def __init__(self, taskId, parents, readyParents, children):
+    def __init__(self, taskId, weight, parents, readyParents, children):
         self.taskId = taskId
+        self.weight = weight
         self.parents = parents
         self.readyParents = readyParents
         self.children = children
 
+
+def createFamilies(vertexBunch, linkBunch):
+    # TODO: exception if bunches are empty ???
+    familyBunch = []
+    for vertex in vertexBunch:
+        currentVertexId = vertex.vertexId
+        currentWeight = vertex.weight
+        currentParents = []
+        currentReadyParents = []
+        currentChildren = []
+        for link in linkBunch:
+            if link.child == currentVertexId:
+                currentParents.append((link.parent, link.weight))
+            if link.parents == currentVertexId:
+                currentChildren.append((link.child, link.weight))
+        for _ in range(len(currentParents)):
+            currentReadyParents.append(False)
+        familyBunch.append(Family(currentVertexId, currentWeight, currentParents, currentReadyParents, currentChildren))
+
+    return familyBunch
+
+
+def isReadyFamily(family):
+    return len(family.readyParents) == family.readyParents.count(True)
 
 # def printGraph():
 #     for v in vertexBunch:
