@@ -4,7 +4,6 @@ import tools
 if __name__ == "__main__":
     vertexBunch = []
     linkBunch = []
-    familyBunch = []
 
     vertexBunch.append(tools.Vertex(0, 3))
     vertexBunch.append(tools.Vertex(1, 4))
@@ -15,5 +14,5 @@ if __name__ == "__main__":
 
     familyBunch = tools.createFamilies(vertexBunch, linkBunch)
     print(familyBunch)
-    
-    # tools.draw(tasks, transmissions, coreAmount, totalTime)
+    tasks, transmissions, coreAmount, totalTime = tools.process(familyBunch)
+    tools.draw(tasks, transmissions, coreAmount, totalTime)
