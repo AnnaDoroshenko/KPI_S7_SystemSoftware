@@ -38,11 +38,13 @@ class Task:
 
 
 class Transmission:
-    def __init__(self, fromV, toV, start, end):
+    def __init__(self, fromV, toV, start, end, fromF, toF):
         self.fromV = fromV
         self.toV = toV
         self.start = start
         self.end = end
+        self.fromF = fromF
+        self.toF = toF
 
 
 def createFamilies(vertexBunch, linkBunch):
@@ -55,12 +57,12 @@ def createFamilies(vertexBunch, linkBunch):
         currentChildren = []
         for link in linkBunch:
             if link.child == currentVertexId:
-                currentParents.append((link.parent, link.weight))
+                currentParents.append((link.parent-1, link.weight))
             if link.parent == currentVertexId:
-                currentChildren.append((link.child, link.weight))
+                currentChildren.append((link.child-1, link.weight))
         for _ in range(len(currentParents)):
             currentReadyParents.append(False)
-        familyBunch.append(Family(currentVertexId, currentWeight, currentParents, currentReadyParents, currentChildren))
+        familyBunch.append(Family(currentVertexId-1, currentWeight, currentParents, currentReadyParents, currentChildren))
 
     return familyBunch
 
@@ -71,18 +73,14 @@ def isReadyFamily(family):
 
 def getReadyFamily(familyBunch):
     for family in familyBunch:
-        if isReadyFamily(family): 
-            readyFamily = familyBunch.pop(familyBunch.index(family))
-
-            return readyFamily
+        if isReadyFamily(family):
+            return familyBunch.pop(familyBunch.index(family))
 
 
 def getFinishTime(tasks, parent):
     for task in tasks:
         if task.taskId == parent[0]:
-            finishTime = task.end
-
-            return finishTime
+            return task.end
 
 
 def findEmptyAndPut(bus, weight, startingAt):
@@ -155,9 +153,11 @@ def process(familyBunch):
     transmissions = []
     while len(familyBunch) != 0:
         readyFamily = getReadyFamily(familyBunch)
+        # print("Starting family " + str(readyFamily.taskId))
         # choosing the most suitable core
         resultCandidates = []
         for core in coreBunch:
+            # print("  DOing core " + str(core.coreId))
             testBus = bus.copy()
             startAt = core.finishTick + 1
             possibleTransmissions = []
@@ -165,9 +165,16 @@ def process(familyBunch):
                 parentCore = findParentCore(tasks, core, parent)
                 if parentCore == core.coreId: continue
                 finishTime = getFinishTime(tasks, parent)
-                finishOfTransmission = findEmptyAndPut(testBus, weight = parent[1], startingAt = finishTime + 1)
+                # print("Finish time of " + str(parent[0]) + " is " + str(finishTime))
+                finishOfTransmission = 1+findEmptyAndPut(testBus, weight = parent[1], startingAt = finishTime + 1)
+                # print(finishOfTransmission)
+                # print("    Now bus is:")
+                # print(testBus)
                 startAt = max(startAt, finishOfTransmission)
-                possibleTransmissions.append(Transmission(parentCore, core.coreId, startAt - parent[1] + 1, startAt))
+                possibleTransmissions.append(Transmission(parentCore, core.coreId,\
+                    finishOfTransmission - parent[1], finishOfTransmission, parent[0], readyFamily.taskId))
+                # possibleTransmissions.append(Transmission(parentCore, core.coreId, startAt - parent[1] + 1, startAt))
+            # print("    Score = " + str(startAt))
             resultCandidates.append((testBus, startAt, possibleTransmissions))
 
         bestIndex = findBestCandidate(resultCandidates)
@@ -186,27 +193,51 @@ def process(familyBunch):
         if coreBunch[len(coreBunch) - 1].finishTick != 0:
             coreBunch.append(Core(len(coreBunch)))
 
-    coreAmount = len(coreBunch)
     totalTime = countTotalTime(coreBunch)
+    coreBunch.pop(len(coreBunch)-1)
+    coreAmount = len(coreBunch)
+    # print(bus)
 
     return tasks, transmissions, coreAmount, totalTime
 
 
 def draw(tasks, transmissions, coreAmount, totalTime):
+    # print(" Tick" + " | ", end='')
+    # for i in range(1, coreAmount+1):
+    #     print("Core" + str(i) + " | ", end='')
+    # print("Transmission")
+    #
+    # for tick in range(1, totalTime):
+    #     if tick < 10:
+    #         print("    " + str(tick) + " | ", end='')
+    #     else:
+    #         print("   " + str(tick) + " | ", end='')
+    #
+    #     for i in range(1, coreAmount+1):
+
     outputTable = [["     " for j in range(coreAmount + 2)] for i in range(totalTime + 1)]
     outputTable[0][0] = " Tick"
     for core in range(coreAmount):
         outputTable[0][core + 1] = "Core" + str(core + 1)
     outputTable[0][coreAmount + 1] = "Transmission"
+    for tick in range(0, totalTime+1):
+        if tick < 10:
+            outputTable[tick][0] = "   " + str(tick) + " "
+        else:
+            outputTable[tick][0] = "  " + str(tick) + " "
     while len(tasks) != 0:
         task = tasks.pop()
         for tick in range(task.start, task.end + 1):
-            outputTable[tick][0] = "   " + str(tick) + " "
-            outputTable[tick][task.core + 1] = "  " + str(task.taskId) + "  "
+            if task.taskId+1 < 10:
+                outputTable[tick][task.core + 1] = "  " + str(task.taskId+1) + "  "
+            else:
+                outputTable[tick][task.core + 1] = " " + str(task.taskId+1) + "  "
     while len(transmissions) != 0:
         transmission = transmissions.pop()
-        outputTable[transmission.start][coreAmount + 1] = "  C" + str(transmission.fromV + 1) + " >> C" + str(transmission.toV + 1)
-        outputTable[transmission.end][coreAmount + 1] = "  C" + str(transmission.toV + 1) + " << C" + str(transmission.fromV + 1)
+        for i in range(transmission.start,transmission.end):
+            outputTable[i][coreAmount + 1] =\
+                "  C" + str(transmission.fromV + 1) + " >> C" + str(transmission.toV + 1)\
+                + " [from " + str(transmission.fromF+1) + " to " + str(transmission.toF+1) + "]"
 
     for row in outputTable:
         row = " | ".join(row)
