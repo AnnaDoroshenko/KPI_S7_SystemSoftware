@@ -45,7 +45,5 @@ if __name__ == "__main__":
     linkBunch.append(tools.Link(14, 15, 3))
 
     familyBunch = tools.createFamilies(vertexBunch, linkBunch)
-    # print(familyBunch)
     tasks, transmissions, coreAmount, totalTime = tools.process(familyBunch)
     tools.draw(tasks, transmissions, coreAmount, totalTime)
-
