@@ -60,7 +60,7 @@ def createFamilies(vertexBunch, linkBunch):
                 currentParents.append((link.parent-1, link.weight))
             if link.parent == currentVertexId:
                 currentChildren.append((link.child-1, link.weight))
-        for _ in range(len(currentParents)):
+        for parent in currentParents:
             currentReadyParents.append(False)
         familyBunch.append(Family(currentVertexId-1, currentWeight, currentParents, currentReadyParents, currentChildren))
 
@@ -98,7 +98,7 @@ def findEmptyAndPut(bus, weight, startingAt):
                     if len(bus) <= j: 
                         break
                     if bus[j]: free = False
-                if (startTick + weight < len(bus)) and free:
+                if free:
                     finishTick = startTick + weight - 1
                     for tick in range(startTick, finishTick + 1): bus[tick] = True
 
@@ -119,9 +119,9 @@ def findEmptyAndPut(bus, weight, startingAt):
 def findBestCandidate(candidates):
     minTick = candidates[0][1]
     index = 0
-    for i in range(len(candidates)):
-        if candidates[i][1] < minTick:
-            minTick = candidates[i][1]
+    for i, candidate in enumerate(candidates):
+        if candidate[1] < minTick:
+            minTick = candidate[1]
             index = i
     
     return index
@@ -153,11 +153,9 @@ def process(familyBunch):
     transmissions = []
     while len(familyBunch) != 0:
         readyFamily = getReadyFamily(familyBunch)
-        # print("Starting family " + str(readyFamily.taskId))
         # choosing the most suitable core
         resultCandidates = []
         for core in coreBunch:
-            # print("  DOing core " + str(core.coreId))
             testBus = bus.copy()
             startAt = core.finishTick + 1
             possibleTransmissions = []
@@ -165,16 +163,10 @@ def process(familyBunch):
                 parentCore = findParentCore(tasks, core, parent)
                 if parentCore == core.coreId: continue
                 finishTime = getFinishTime(tasks, parent)
-                # print("Finish time of " + str(parent[0]) + " is " + str(finishTime))
                 finishOfTransmission = 1+findEmptyAndPut(testBus, weight = parent[1], startingAt = finishTime + 1)
-                # print(finishOfTransmission)
-                # print("    Now bus is:")
-                # print(testBus)
                 startAt = max(startAt, finishOfTransmission)
                 possibleTransmissions.append(Transmission(parentCore, core.coreId,\
                     finishOfTransmission - parent[1], finishOfTransmission, parent[0], readyFamily.taskId))
-                # possibleTransmissions.append(Transmission(parentCore, core.coreId, startAt - parent[1] + 1, startAt))
-            # print("    Score = " + str(startAt))
             resultCandidates.append((testBus, startAt, possibleTransmissions))
 
         bestIndex = findBestCandidate(resultCandidates)
@@ -196,31 +188,17 @@ def process(familyBunch):
     totalTime = countTotalTime(coreBunch)
     coreBunch.pop(len(coreBunch)-1)
     coreAmount = len(coreBunch)
-    # print(bus)
 
     return tasks, transmissions, coreAmount, totalTime
 
 
 def draw(tasks, transmissions, coreAmount, totalTime):
-    # print(" Tick" + " | ", end='')
-    # for i in range(1, coreAmount+1):
-    #     print("Core" + str(i) + " | ", end='')
-    # print("Transmission")
-    #
-    # for tick in range(1, totalTime):
-    #     if tick < 10:
-    #         print("    " + str(tick) + " | ", end='')
-    #     else:
-    #         print("   " + str(tick) + " | ", end='')
-    #
-    #     for i in range(1, coreAmount+1):
-
     outputTable = [["     " for j in range(coreAmount + 2)] for i in range(totalTime + 1)]
     outputTable[0][0] = " Tick"
     for core in range(coreAmount):
         outputTable[0][core + 1] = "Core" + str(core + 1)
     outputTable[0][coreAmount + 1] = "Transmission"
-    for tick in range(0, totalTime+1):
+    for tick in range(1, totalTime+1):
         if tick < 10:
             outputTable[tick][0] = "   " + str(tick) + " "
         else:
@@ -229,15 +207,15 @@ def draw(tasks, transmissions, coreAmount, totalTime):
         task = tasks.pop()
         for tick in range(task.start, task.end + 1):
             if task.taskId+1 < 10:
-                outputTable[tick][task.core + 1] = "  " + str(task.taskId+1) + "  "
+                outputTable[tick][task.core + 1] = "  " + str(task.taskId + 1) + "  "
             else:
-                outputTable[tick][task.core + 1] = " " + str(task.taskId+1) + "  "
+                outputTable[tick][task.core + 1] = " " + str(task.taskId + 1) + "  "
     while len(transmissions) != 0:
         transmission = transmissions.pop()
         for i in range(transmission.start,transmission.end):
             outputTable[i][coreAmount + 1] =\
-                "  C" + str(transmission.fromV + 1) + " >> C" + str(transmission.toV + 1)\
-                + " [from " + str(transmission.fromF+1) + " to " + str(transmission.toF+1) + "]"
+                " C" + str(transmission.fromV + 1) + " >> C" + str(transmission.toV + 1)\
+                + " [from " + str(transmission.fromF + 1) + " to " + str(transmission.toF + 1) + "]"
 
     for row in outputTable:
         row = " | ".join(row)
